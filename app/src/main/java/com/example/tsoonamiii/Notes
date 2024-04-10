@@ -1,0 +1,275 @@
+------------  *** URL: *** --------------
+ syntax: <scheme>://<authority><path>?<query>#<fragment>
+ constructor :  URL( string spec)
+           where the string to parse as a URL
+           return MalformedURLException  if no protocol is specified, or an unknown protocol is found, or spec is null.
+
+ Method:-
+ * getContent(): Object => gets te contents of this URL.
+ * you can get query, path, Host, File, etc using getQuery(), getPath(), getFile(), and all with respective name. It will return in string.
+ * openConnection() : URLConnection =>Returns a URLConnection instance that represents a connection to the remote object referred to by the URL.
+            A new instance of URLConnection is created every time when invoked. It should be noted that a URLConnection instance does not establish
+            the actual network connection on creation. This will happen only when calling URLConnection.connect().
+
+
+
+
+ --------------*** URLConnection *** -------------
+It represent a communications link between the application and a URL.
+Instances of this class can be used both to read from and to write to the resource referenced by the URL.
+
+* Constructor: URLConnection (url : URL)
+
+
+* Method:-
+   1. void connect () => Opens a communications link to the resource referenced by this URL, if such a connection has not already been established.
+   2. getInputStream() : InputStream => Returns an input stream that reads from this open connection.
+            getOutputStream() : OutputStream => similar to input stream.
+   3. setConnectTimeout (timeout : Int) => Sets a specified timeout value, in milliseconds, to be used when opening a communications link to the resource referenced by this URLConnection.
+            If the timeout expires before the connection can be established, a java.net.SocketTimeoutException is raised.
+   4. setReadTimeout (timeout : Int) => Sets the read timeout to a specified timeout, in milliseconds. A non-zero value specifies the timeout when reading from Input stream
+             when a connection is established to a resource. If the timeout expires before there is data available for read, a java.net.SocketTimeoutException is raised.
+
+
+
+* creating a connection to a URL :
+   1. The connection object is created by invoking the "openConnection()" method on a URL.
+   2. The setup parameters and general request properties are manipulated.
+   3. The actual connection to the remote object is made, using the "connect()" method.
+   4. The remote object becomes available. The header fields and the contents of the remote object can be accessed.
+
+
+*  The setup parameters are modified using the following methods:
+
+   - setAllowUserInteraction(boolean)
+   - setDoInput (boolean) => A URL connection can be used for input and/or output.
+          Set the DoInput flag to true if you intend to use the URL connection for input, false if not.
+          The default is true.
+   - setDoOutput (boolean )=> same as setDoInput()
+   - setIfModifiedSince (Long)
+   - setUseCaches (boolean)
+   and the general request properties are modified using the method:
+
+   - setRequestProperty(key: String, value: String) => Sets the general request property. If a property with the key already exists.
+            The keyword by which the request is known (e.g., "Accept").
+
+*  The following methods are used to access the header fields and the contents after the connection is made to the remote object:
+
+   - getContent
+   - getHeaderField
+   - getInputStream
+   - getOutputStream
+
+
+
+
+ -------------- ***  HttpURLConnection  *** ----------------------
+
+  It is a URLConnection with support for HTTP-specific features.
+
+  * Method:-
+     1. there are some methods in http such as "GET" to get response from server, "POST" to set or post response to server, "PUT", "HEAD", "TRACE", etc.
+
+     2. there are some status-code which indicate the status/result of response/request from server such as 404 which indicates error. Thus it is of 5 categores:
+
+          - 1xx:  Informational responses. These codes indicate that the request was received and is being processed, but no response is available yet
+
+          - 2xx: Successful responses. These codes indicate that the request was successfully completed and the desired resource or action was fulfilled
+                 eg. 200
+
+          - 3xx: Redirection messages. These codes indicate that the client needs to perform additional actions or follow a different URL to complete the request
+
+          - 4xx: Client error responses. These codes indicate that the request was invalid or cannot be fulfilled due to some error on the client's side
+                 eg. 404
+
+          - 5xx: Server error responses. These codes indicate that the request was valid but the server encountered an error or failed to complete the request
+
+     3. setRequestMethod(method: String) =>set the method for URL request using one of the method explained in 1st point ( above).
+
+
+  * steps to use:
+
+     1. Obtain a new HttpURLConnection by calling URL.openConnection() and casting the result to HttpURLConnection.
+
+     2. Prepare the request. The primary property of a request is its URI. Request headers may also include metadata such as credentials, preferred content types.
+
+     3. Optionally upload a request body. Instances must be configured with setDoOutput(true) if they include a request body.
+        Transmit data by writing to the stream returned by URLConnection.getOutputStream().
+
+     4. Read the response. Response headers typically include metadata such as the response body's content type and length, modified dates and session cookies.
+        The response body may be read from the stream returned by URLConnection.getInputStream(). If the response has no body, that method returns an empty stream.
+
+     5. Disconnect. Once the response body has been read, the HttpURLConnection should be closed by calling disconnect().
+        Disconnecting releases the resources held by a connection so they may be closed or reused.
+
+
+     For example, to retrieve the webpage at http://www.android.com/:
+
+        URL url = new URL("http://www.android.com/");
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        try {
+          InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+          readStream(in);
+        } finally {
+          urlConnection.disconnect();
+        }
+
+
+
+
+
+
+  ------------------- *** InputStream *** -----------------
+
+  Input stream is the set of data you are abstracting from websites or files. The input stream is read by InputStreamReader , which
+  acts as bridge from byte streams to character streams. It reads bytes and decodes them into characters using specified charset.
+  charset is the representation of data in computer, such as UTF-8, ASCII, etc. The charset that it uses may be specified by name or may be given explicitly.
+
+  InputStreamReader contains a buffer of bytes read from the source stream and converts these into characters as needed. The buffer size is 8K.
+  Constructor: InputStreamReader(in : InputStream , charset: Charset)
+
+  Method: -
+    1. read() => Reads a single character from this reader and returns it as an integer with the two higher-order bytes set to 0.
+          Returns -1 if the end of the reader has been reached.The byte value is either obtained from converting bytes in this reader's buffer or by
+          first filling the buffer from the source InputStream and then reading from the buffer.
+    2. close() => closes this reader.
+
+
+  InputStreamReader is less effective as it read a single character data at time. so we use BufferedReader which adds functionality to another input stream-namely,
+   the ability to buffer the input and to support the mark and reset methods. it wraps the existing Reader and buffers the input. It maintains a buffer,
+    which is an area of memory used for temporary storage of data. When a request for data is made, if the data is already present in the buffer, then it
+    can satisfy the request without needing to interact with the underlying reader again.
+
+     The drawback is that some extra space is required to hold the buffer and that copying takes place when filling that buffer, but this is usually outweighed by the performance benefits.
+
+   When the BufferedReader is created, an internal buffer array is created.
+   As bytes from the stream are read or skipped, the internal buffer is refilled as necessary from the contained input stream, many bytes at a time. The mark operation remembers
+   a point in the input stream and the reset operation causes all the bytes read since the most recent mark operation to be reread before new bytes are taken from the contained input stream.
+
+   Constructor:- BufferedInputStream(in: InputStream)
+
+   Method: - it also have same method like read() , close(), and some additional method like reset() and mark().
+       readLine() : String :- Returns the next line of text available from this reader.
+
+
+   ex. :-
+           // Create input stream 'demo.txt'
+           // for reading containing
+           // text "GEEKSFORGEEKS"
+           FileInputStream inputStream = new FileInputStream("c:/demo.txt");
+
+           // Convert inputStream to
+           // bufferedInputStream
+           BufferedInputStream buffInputStr = new BufferedInputStream( inputStream);
+
+           // Read until a single byte is available
+           while (buffInputStr.available() > 0) {
+
+               // Read the byte and
+               // convert the integer to character
+               char c = (char)buffInputStr.read();
+
+               // Print the characters
+               System.out.println("Char : " + c);
+           }
+   Let's say the file have : KanhaiyaKumar
+   OUTPUT of the above program:
+    char: K
+    char: a
+    char: n
+    char: h
+    char: a
+     ...   ...
+     ...   ...
+     char: r
+
+
+
+
+     ________________________ *** MultiTasking *** -------------------------
+
+     Initially, all components run in same thread called main thread. The operation which take more time, is being moved to another thread. AsyncTask can do this.
+     Asynchronous tasks are divided into three generic types: Params, Progress, & Result and four steps: onPreExecute, doInBackground, onProgressUpdate, & onPostExecute.
+
+     1. Params: the type of Parameters sent to the task upon execution, (jo operation execute karna hai wo send karate hai isme)
+     2. Progress: the type of Progress units shared during the background computation, (operation execute karte time jo progress ho raha hai, jaise 50% downloaded (status) wo hai ya)
+     3. Result: the type of Result obtained from the background computation, (background thread se jo result mila wo hai ya)
+
+     1. doInBackground(): The code that has to be run in the background is contained in the doInBackground() method. There is a " publishProgress() " method in this method which allows us to
+        repeatedly deliver results to the UI thread.
+
+     2. onPreExecute(): The code that runs prior to the beginning of the background processing is contained in this function. This step is normally used to setup the task, for instance by showing a progress bar in the user interface.
+
+     3. onPostExecute(): After the doInBackground method has finished processing, the onPostExecute() method is called. This method receives the output of the doInBackground method as its input.
+
+     4. onProgressUpdate(): This method can use the progress updates it receives from the publishProgress method, which publishes progress updates from the doInBackground function, to update the UI thread.
+
+
+      Firstly onPreExecute() is invoked on main thread before task , then doInBackground(Params). The parameters of the asynchronous task are passed to this step as "Params". In this step we can call,
+      publishProgress(Progress) to publish one or more units of progress. These values are published on the UI thread, in the onProgressUpdate(Progress) step.
+      onProgressUpdate(Progress) is used to display any form of progress in the user interface while the background computation is still executing. For instance, it can be used to animate a progress bar or show logs in a text field.
+      onPostExecute(Result), invoked on the UI thread after the background computation finishes. The result of the background computation is passed to this step as a parameter.
+
+
+
+      To execute AsyncTask, execute(Params) must be invoked on the UI thread.
+      In Kotlin, "vararg" allows you to pass (a variable number of arguments) of type "Params". In other words, you can pass 4 parameter or 5 or 6, any number of parameter of type "Params".
+      Inside the function, params is treated as an array of type Params, containing all the arguments passed to the function.
+      You can call the function any no. of 'Params' arguments. ex.-
+
+      fun f(vararg x: String){
+          // code
+      }
+
+      we can call this function as :
+      f(x1, x2, x3)
+
+      Now come to AsyncTask implementation let's say example:
+
+
+
+      class DownloadFilesTask : AsyncTask<URL, Int, Long>() {
+
+          override fun doInBackground(vararg urls: URL): Long {
+              var totalSize: Long = 0
+              val count = urls.size
+
+              runBlocking {
+                  coroutineScope {
+                      // Launch a coroutine for each URL
+                      val jobs = ArrayList<Job>()
+                      for (i in 0 until count) {
+                          val job = launch {
+                              totalSize += Downloader.downloadFile(urls[i])
+                              // Calculate progress and publish it
+                              val progress = ((i + 1) / count.toFloat() * 100).toInt()
+                              publishProgress(progress)
+                          }
+                          jobs.add(job)
+                      }
+                      // Wait for all coroutines to finish
+                      jobs.joinAll()
+                  }
+              }
+              return totalSize
+          }
+
+          override fun onProgressUpdate(vararg progress: Int?) {
+              setProgressPercent(progress[0])
+          }
+
+          override fun onPostExecute(result: Long?) {
+              showDialog("Downloaded $result bytes")
+          }
+      }
+
+      To execute the DownloadFilesTask() :
+      DownloadFilesTask().execute(url1, url2, url3);
+
+
+      we had 3 generic types : Params, Progress and Result. Not all types are always used by an asynchronous task. If any of them is unused, simply use the type Void as:
+      class MyTask extends AsyncTask<Void, Void, Void> { ... }
+
+
+
+     AsyncTask is deprecated. we use Kotlin concurrency utilities.
